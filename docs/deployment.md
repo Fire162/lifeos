@@ -78,9 +78,62 @@ Back up these resources together:
 
 - The MySQL database, including `app_state`, habit tables, sign-in credentials, and attachment metadata.
 - Private attachment files.
-- Deployment configuration, stored securely outside the repository.
+- Deployment configuration (`.env` or `config.php`), stored securely outside the repository.
 
-Attachment files are stored outside the public directory in a `.lifeos-files-*` directory derived from the backend location. Moving the backend can change that derived path; restore the uploaded files into the directory used by the new deployment.
+> **Note**: Backups contain private notes, credentials, and attachments. Store backup files securely with restricted file permissions.
+
+### Docker backup commands
+
+From the directory containing your `docker-compose.yml` and `.env`:
+
+1. **Dump the MySQL database**:
+   ```sh
+   docker compose exec -T db mysqldump -u lifeos -p"$LIFEOS_DB_PASSWORD" lifeos > lifeos-db-backup.sql
+   ```
+   *(Or using root credentials: `docker compose exec -T db mysqldump -u root -p"$LIFEOS_DB_ROOT_PASSWORD" lifeos > lifeos-db-backup.sql`)*
+
+2. **Back up the attachments volume**:
+   ```sh
+   docker compose run --rm -v attachments:/data/attachments -v "$(pwd)":/backup alpine tar czf /backup/lifeos-attachments-backup.tar.gz -C /data/attachments .
+   ```
+
+3. **Back up configuration**:
+   ```sh
+   cp .env lifeos-env-backup
+   ```
+
+### Docker restore commands
+
+To restore into a fresh installation:
+
+1. **Restore configuration and start database container**:
+   ```sh
+   cp lifeos-env-backup .env
+   docker compose up -d db
+   ```
+
+2. **Restore MySQL database**:
+   ```sh
+   docker compose exec -T db mysql -u lifeos -p"$LIFEOS_DB_PASSWORD" lifeos < lifeos-db-backup.sql
+   ```
+
+3. **Restore attachments volume**:
+   ```sh
+   docker compose run --rm -v attachments:/data/attachments -v "$(pwd)":/backup alpine tar xzf /backup/lifeos-attachments-backup.tar.gz -C /data/attachments
+   ```
+
+4. **Start all services**:
+   ```sh
+   docker compose up -d
+   ```
+
+### Verify your backup
+
+To verify that the backup is valid and intact:
+1. Run `docker compose ps` and confirm both `app` and `db` report `healthy`.
+2. Open `http://localhost:8080` (or your configured `LIFEOS_PORT`), sign in with your credentials, and verify existing habits, notes, and boards display as expected.
+
+Attachment files are stored outside the public directory in a `.lifeos-files-*` directory derived from the backend location (or mounted at `/data/attachments` in the container). Moving the backend can change that derived path; restore the uploaded files into the directory used by the new deployment.
 
 Existing browser data is imported once. Conflicting older snapshots are retained as `legacy_backup_*` rows in `app_state`. Preserve these records when backing up or migrating.
 
