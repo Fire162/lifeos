@@ -15,9 +15,7 @@ const DEFAULT_ICON = "✓";
 
 function respond(array $payload, int $status = 200): never
 {
-    http_response_code($status);
-    echo json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-    exit;
+    life_os_json_reply($payload, $status);
 }
 
 function utc_now(): string
@@ -37,32 +35,18 @@ function body(): array
     return is_array($decoded) ? $decoded : [];
 }
 
-function database(): PDO
-{
-    $db = life_os_db();
-    migrate($db);
-    return $db;
-}
-
-function migrate(PDO $db): void
-{
-    $statement = $db->prepare("INSERT IGNORE INTO categories(name, created_at)
-               SELECT DISTINCT category, ? FROM habits WHERE TRIM(category) != ''");
-    $statement->execute([utc_now()]);
-
-    if ((int) $db->query('SELECT COUNT(*) FROM habits')->fetchColumn() === 0) {
-        $now = utc_now();
-        $db->beginTransaction();
-        $category = $db->prepare('INSERT IGNORE INTO categories(name, created_at) VALUES (?, ?)');
-        foreach (['Focus', 'Health', 'Learning'] as $name) {
-            $category->execute([$name, $now]);
-        }
-        $habit = $db->prepare('INSERT INTO habits(name, category, color, icon, created_at) VALUES (?, ?, ?, ?, ?)');
-        $habit->execute(['Deep work', 'Focus', '#8b5cf6', '◈', $now]);
-        $habit->execute(['Exercise', 'Health', '#10b981', '◆', $now]);
-        $habit->execute(['Reading', 'Learning', '#f59e0b', '◇', $now]);
-        $db->commit();
+function habit_input(PDO $db, array $payload): array {
+    $name = clean_text($payload['name'] ?? null);
+    $categoryName = clean_text($payload['category'] ?? null, '', 60);
+    $color = clean_text($payload['color'] ?? null, '#8b5cf6', 20) ?: '#8b5cf6';
+    $icon = clean_text($payload['icon'] ?? null, DEFAULT_ICON, 4) ?: DEFAULT_ICON;
+    if (!$name) respond(['error' => 'Habit name is required.'], 400);
+    if ($categoryName) {
+        $known = $db->prepare('SELECT 1 FROM categories WHERE name = ?');
+        $known->execute([$categoryName]);
+        if (!$known->fetchColumn()) respond(['error' => 'Unknown category. Add it first.'], 400);
     }
+    return [$name, $categoryName, $color, $icon];
 }
 
 function habit(PDO $db, int $id): array|false
@@ -80,7 +64,7 @@ function category(PDO $db, int $id): array|false
 }
 
 try {
-    $db = database();
+    $db = life_os_db();
     $method = strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET');
     $route = trim((string) ($_GET['route'] ?? ''), '/');
     $parts = $route === '' ? [] : explode('/', $route);
@@ -96,9 +80,14 @@ try {
     }
 
     if ($method === 'GET' && $route === 'logs') {
-        $start = (string) ($_GET['start'] ?? '');
-        $end = (string) ($_GET['end'] ?? '');
+        try {
+            $start = api_date($_GET['start'] ?? null, 'start');
+            $end = api_date($_GET['end'] ?? null, 'end');
+        } catch (ApiException $error) {
+            respond(['error' => $error->getMessage()], 400);
+        }
         if (!$start || !$end) respond(['error' => 'start and end query parameters are required.'], 400);
+        if ($start > $end) respond(['error' => 'start must be on or before end.'], 400);
         $stmt = $db->prepare('SELECT habit_id, log_date FROM habit_logs WHERE done = 1 AND log_date >= ? AND log_date <= ? ORDER BY log_date, habit_id');
         $stmt->execute([$start, $end]);
         $logs = [];
@@ -107,16 +96,7 @@ try {
     }
 
     if ($method === 'POST' && $route === 'habits') {
-        $name = clean_text($payload['name'] ?? null);
-        $categoryName = clean_text($payload['category'] ?? null, '', 60);
-        $color = clean_text($payload['color'] ?? null, '#8b5cf6', 20) ?: '#8b5cf6';
-        $icon = clean_text($payload['icon'] ?? null, DEFAULT_ICON, 4) ?: DEFAULT_ICON;
-        if (!$name) respond(['error' => 'Habit name is required.'], 400);
-        if ($categoryName) {
-            $known = $db->prepare('SELECT 1 FROM categories WHERE name = ?');
-            $known->execute([$categoryName]);
-            if (!$known->fetchColumn()) respond(['error' => 'Unknown category. Add it first.'], 400);
-        }
+        [$name, $categoryName, $color, $icon] = habit_input($db, $payload);
         $stmt = $db->prepare('INSERT INTO habits(name, category, color, icon, created_at) VALUES (?, ?, ?, ?, ?)');
         $stmt->execute([$name, $categoryName, $color, $icon, utc_now()]);
         respond(['habit' => habit($db, (int) $db->lastInsertId())], 201);
@@ -160,16 +140,7 @@ try {
     if (count($parts) === 2 && in_array($method, ['PUT', 'PATCH'], true) && ctype_digit($parts[1])) {
         $id = (int) $parts[1];
         if ($parts[0] === 'habits') {
-            $name = clean_text($payload['name'] ?? null);
-            $categoryName = clean_text($payload['category'] ?? null, '', 60);
-            $color = clean_text($payload['color'] ?? null, '#8b5cf6', 20) ?: '#8b5cf6';
-            $icon = clean_text($payload['icon'] ?? null, DEFAULT_ICON, 4) ?: DEFAULT_ICON;
-            if (!$name) respond(['error' => 'Habit name is required.'], 400);
-            if ($categoryName) {
-                $known = $db->prepare('SELECT 1 FROM categories WHERE name = ?');
-                $known->execute([$categoryName]);
-                if (!$known->fetchColumn()) respond(['error' => 'Unknown category. Add it first.'], 400);
-            }
+            [$name, $categoryName, $color, $icon] = habit_input($db, $payload);
             $stmt = $db->prepare('UPDATE habits SET name = ?, category = ?, color = ?, icon = ? WHERE id = ? AND archived = 0');
             $stmt->execute([$name, $categoryName, $color, $icon, $id]);
             if (!$stmt->rowCount() && !habit($db, $id)) respond(['error' => 'Habit not found.'], 404);
@@ -219,6 +190,7 @@ try {
 
     respond(['error' => 'Not found.'], 404);
 } catch (Throwable $e) {
+    if (isset($db) && $db->inTransaction()) $db->rollBack();
     error_log($e->__toString());
     respond(['error' => 'Database unavailable. Check config.php and MySQL.'], 503);
 }

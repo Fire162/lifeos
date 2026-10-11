@@ -1,0 +1,6 @@
+{
+  "name": "edrisranjbar/lifeos",
+  "description": "Life OS development tests",
+  "license": "MIT",
+  "require-dev": { "phpunit/phpunit": "^10.5" }
+}

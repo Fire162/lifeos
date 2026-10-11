@@ -1417,3 +1417,16 @@ button:focus-visible, summary:focus-visible, .background-choice:has(input:focus-
   .trello-action-row { gap: 6px; }
   .trello-action-row button { font-size: 12px; }
 }
+
+/* Shared inline editor: focus feedback is CSS, and finish only runs once. */
+.inline-edit-input,.board-rename-input,.column-rename-input {
+  box-sizing:border-box;width:100%;background:var(--surface-2);color:var(--text);
+  border:1px solid var(--accent);border-radius:3px;font:inherit;font-size:13px;outline:none;
+}
+.inline-edit-input{padding:8px 12px;border-color:var(--border);border-radius:var(--radius-sm)}
+.board-rename-input{padding:4px 8px}
+.column-rename-input{padding:2px 6px;font-weight:600;text-transform:uppercase;letter-spacing:.02em}
+.inline-edit-input:focus-visible,.board-rename-input:focus-visible,.column-rename-input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+}

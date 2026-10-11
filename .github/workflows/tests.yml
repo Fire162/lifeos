@@ -8,6 +8,15 @@ on:
 jobs:
   tests:
     runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: fixture-only-password
+        ports: ['3308:3306']
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost -pfixture-only-password"
+          --health-interval=10s --health-timeout=5s --health-retries=10
 
     steps:
       - name: Checkout repository
@@ -17,7 +26,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.3'
-          extensions: pdo_sqlite, mbstring
+          extensions: pdo_sqlite, pdo_mysql, mbstring
           coverage: none
 
       - name: Set up Node.js
@@ -27,17 +36,44 @@ jobs:
           cache: npm
           cache-dependency-path: mcp/package-lock.json
 
-      - name: Run timer tests
-        run: node --test tests/timer.test.mjs
+      - name: Run all Node tests
+        run: node --test tests/*.test.mjs
       
-      - name: Run growth model tests
-        run: node --test tests/growth-model.test.mjs
+
+      - name: Lint PHP
+        run: git ls-files '*.php' | xargs -n 1 php -l
+
+      - name: Install PHPUnit
+        run: composer install --no-interaction --prefer-dist
+
+      - name: Run PHPUnit library tests
+        run: vendor/bin/phpunit
+
+      - name: Run proxy tests
+        run: php tests/proxy_test.php
+
+      - name: Run MySQL migration regressions
+        env:
+          LIFEOS_TEST_DB_PASSWORD: fixture-only-password
+        run: php tests/migrations_test.php 3308
 
       - name: Run API tests
         run: php tests/api_test.php
 
       - name: Run obligations tests
         run: php tests/obligations_test.php
+
+      - name: Run logout HTTP tests
+        run: php tests/logout_test.php
+
+      - name: Run credential bootstrap tests
+        run: php tests/credentials_test.php
+
+      - name: Run Habittify log range tests
+        run: php tests/habittify_logs_test.php
+
+      - name: Run Habittify rollback test
+        run: php tests/habittify_rollback_test.php
 
       - name: Install MCP dependencies
         run: npm ci --prefix mcp

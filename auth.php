@@ -58,10 +58,13 @@ function life_os_start_session(): void
 }
 
 /** Reject state-changing requests that lack this session's CSRF token. */
-function life_os_require_csrf(): void
+function life_os_require_csrf(?callable $onFailure = null): void
 {
     life_os_start_session();
     if (empty($_SESSION['state_csrf']) || !hash_equals((string) $_SESSION['state_csrf'], (string) ($_SERVER['HTTP_X_CSRF_TOKEN'] ?? ''))) {
+        // Endpoints can retain their response shape or throw their API exception.
+        // A callback that accidentally returns must never allow the write through.
+        if ($onFailure !== null) $onFailure();
         http_response_code(403);
         header('Content-Type: application/json; charset=utf-8');
         echo json_encode(['error' => 'Invalid request token. Reload the page.'], JSON_UNESCAPED_UNICODE);
@@ -97,19 +100,9 @@ function life_os_is_authenticated(): bool
         $credentials = life_os_credentials();
         $fingerprint = life_os_credential_fingerprint($credentials);
         $sessionFingerprint = (string) ($_SESSION['life_os_fingerprint'] ?? '');
-        if (hash_equals($fingerprint, $sessionFingerprint)) return true;
-
-        // Upgrade sessions created before credentials moved from config.php to MySQL.
-        $config = life_os_config();
-        $legacyFingerprint = hash('sha256', $config['username'] . "\0" . $config['password']);
-        if ($credentials['username'] === $config['username']
-            && password_verify($config['password'], $credentials['password_hash'])
-            && hash_equals($legacyFingerprint, $sessionFingerprint)) {
-            $_SESSION['life_os_username'] = $credentials['username'];
-            $_SESSION['life_os_fingerprint'] = $fingerprint;
-            return true;
-        }
-    } catch (Throwable) {
+        return hash_equals($fingerprint, $sessionFingerprint);
+    } catch (Throwable $error) {
+        error_log('LifeOS authentication failed: ' . get_class($error) . ' (code ' . $error->getCode() . ') at ' . $error->getFile() . ':' . $error->getLine());
     }
     return false;
 }

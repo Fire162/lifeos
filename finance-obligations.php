@@ -10,7 +10,7 @@ try {
     $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
     api_method(['GET', 'POST'], $method);
     if ($method === 'POST') {
-        if (empty($_SESSION['state_csrf']) || !hash_equals((string) $_SESSION['state_csrf'], (string) ($_SERVER['HTTP_X_CSRF_TOKEN'] ?? ''))) throw new ApiException(403, 'invalid_request_token', 'Reload before saving.');
+        life_os_require_csrf(fn () => throw new ApiException(403, 'invalid_request_token', 'Reload before saving.'));
         api_json(obligation_mutate($store, api_body()));
     }
     if (isset($_GET['occurrence'])) api_json(obligation_find($store->get(OBLIGATIONS_KEY, obligations_default()), $_GET['occurrence'], finance_periods($store)));

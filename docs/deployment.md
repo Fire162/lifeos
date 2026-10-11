@@ -19,6 +19,12 @@ The `app` service has a healthcheck that requests `/login.php`, so `docker compo
 
 Put a TLS-terminating reverse proxy (Caddy, Traefik, nginx) in front of the container before exposing it to the internet, and set `LIFEOS_TRUST_PROXY=true`. The app then marks the session cookie `Secure` based on `X-Forwarded-Proto` and rate-limits sign-in per client using the last `X-Forwarded-For` address. Leave it `false` when the container is reachable directly, because those headers could otherwise be spoofed.
 
+## Sign-in credentials after setup
+
+The configured sign-in `username` and `password` (Docker: `LIFEOS_USERNAME` and `LIFEOS_PASSWORD`) are required only when creating the initial `app_credentials` row. After setup, you can remove these bootstrap values from `config.php` or `.env`; keep all database connection credentials. For Docker, recreate the app container to remove the old values from its environment. Login and session validation use the username and password hash stored in MySQL; changing bootstrap values does not reset an existing account. Manage sign-in credentials in Settings.
+
+An empty credentials table still requires non-empty bootstrap values and fails with an explicit setup error if either is missing. Restore the credentials row with your database backup when recovering an installation. Sessions from the old plaintext configuration fingerprint are no longer upgraded and must sign in again; sessions already using the stored credential hash continue to work.
+
 ## Shared hosting release zip
 
 Each tagged release publishes `lifeos-<version>.zip` on GitHub Releases, built with `git archive` (development files are excluded via `.gitattributes`). Its layout matches typical cPanel hosting:
