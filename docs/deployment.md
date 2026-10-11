@@ -88,14 +88,15 @@ From the directory containing your `docker-compose.yml` and `.env`:
 
 1. **Dump the MySQL database**:
    ```sh
-   docker compose exec -T db mysqldump -u lifeos -p"$LIFEOS_DB_PASSWORD" lifeos > lifeos-db-backup.sql
+   docker compose exec -T db sh -c 'exec mysqldump -u lifeos -p"$MYSQL_PASSWORD" lifeos' > lifeos-db-backup.sql
    ```
-   *(Or using root credentials: `docker compose exec -T db mysqldump -u root -p"$LIFEOS_DB_ROOT_PASSWORD" lifeos > lifeos-db-backup.sql`)*
+   *(Or using root credentials: `docker compose exec -T db sh -c 'exec mysqldump -u root -p"$MYSQL_ROOT_PASSWORD" lifeos' > lifeos-db-backup.sql`)*
 
 2. **Back up the attachments volume**:
    ```sh
-   docker compose run --rm -v attachments:/data/attachments -v "$(pwd)":/backup alpine tar czf /backup/lifeos-attachments-backup.tar.gz -C /data/attachments .
+   docker run --rm -v lifeos_attachments:/data/attachments -v "$(pwd)":/backup alpine tar czf /backup/lifeos-attachments-backup.tar.gz -C /data/attachments .
    ```
+   *(If your Compose project name differs from `lifeos`, use `docker volume ls` to find your `<project>_attachments` volume name).*
 
 3. **Back up configuration**:
    ```sh
@@ -114,12 +115,12 @@ To restore into a fresh installation:
 
 2. **Restore MySQL database**:
    ```sh
-   docker compose exec -T db mysql -u lifeos -p"$LIFEOS_DB_PASSWORD" lifeos < lifeos-db-backup.sql
+   docker compose exec -T db sh -c 'exec mysql -u lifeos -p"$MYSQL_PASSWORD" lifeos' < lifeos-db-backup.sql
    ```
 
 3. **Restore attachments volume**:
    ```sh
-   docker compose run --rm -v attachments:/data/attachments -v "$(pwd)":/backup alpine tar xzf /backup/lifeos-attachments-backup.tar.gz -C /data/attachments
+   docker run --rm -v lifeos_attachments:/data/attachments -v "$(pwd)":/backup alpine tar xzf /backup/lifeos-attachments-backup.tar.gz -C /data/attachments
    ```
 
 4. **Start all services**:
