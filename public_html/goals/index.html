@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <script src="/assets/storage.js?v=currency-1"></script>
+  <script src="/assets/storage.js?v=issue19-1"></script>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="SMART goals — define goals, break them into tasks, and track progress.">
@@ -17,7 +17,8 @@
       }
     })();
   </script>
-  <link rel="stylesheet" href="assets/styles/style.css?v=compact-cards-1">
+  <link rel="stylesheet" href="assets/styles/style.css?v=issue19-1">
+<script src="/assets/html-escape.js?v=issue19-1"></script>
 </head>
 <body>
   <div class="aurora" aria-hidden="true"><span></span><span></span><span></span></div>
@@ -61,7 +62,7 @@
           <div class="eyebrow" id="wizardEyebrow">New Goal</div>
           <h3 id="wizardTitle">Define a SMART goal</h3>
         </div>
-        <button type="button" class="icon-btn modal-close" id="closeWizard" title="Close">×</button>
+        <button type="button" class="icon-btn modal-close" id="closeWizard" title="Close" aria-label="Close">×</button>
       </div>
 
       <ol class="wizard-steps" id="wizardSteps" aria-label="SMART framework steps">
@@ -155,7 +156,7 @@
         <div class="eyebrow" id="detailCategory">Category</div>
         <h3 id="detailTitle">Goal</h3>
       </div>
-      <button type="button" class="icon-btn modal-close" id="closeDetail" title="Close">×</button>
+      <button type="button" class="icon-btn modal-close" id="closeDetail" title="Close" aria-label="Close">×</button>
     </div>
 
     <div class="detail-meta" id="detailMeta"></div>
@@ -193,7 +194,7 @@
   </dialog>
 
   <div class="toast" id="toast"></div>
-  <script src="/assets/goal-progress.js?v=1" defer></script>
-  <script src="assets/scripts/app.js?v=compact-cards-2" defer></script>
+  <script src="/assets/goal-progress.js?v=issue19-1" defer></script>
+  <script src="assets/scripts/app.js?v=issue19-1" defer></script>
 </body>
 </html>

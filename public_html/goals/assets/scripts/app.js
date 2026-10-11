@@ -151,12 +151,7 @@ function formatDate(iso) {
   });
 }
 
-function escapeHtml(s) {
-  if (s == null) return "";
-  const div = document.createElement("div");
-  div.textContent = String(s);
-  return div.innerHTML;
-}
+const escapeHtml = globalThis.lifeOsHtml.escapeHtml;
 
 function calcProgress(goal) { return progressResult(goal).pct; }
 function isCompleted(goal) { return progressResult(goal).pct === 100; }

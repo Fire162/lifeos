@@ -626,15 +626,7 @@ async function deleteCurrentHabit() {
   showToast("Habit removed");
 }
 
-function escapeHtml(value) {
-  return String(value).replace(
-    /[&<>'"]/g,
-    (char) =>
-      ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" })[
-        char
-      ],
-  );
-}
+const escapeHtml = globalThis.lifeOsHtml.escapeHtml;
 
 function sanitizeColor() {
   return "#64748b";

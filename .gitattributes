@@ -13,3 +13,7 @@
 /intro-preview.gif export-ignore
 /_*.js export-ignore
 /_*.json export-ignore
+/tools export-ignore
+/composer.json export-ignore
+/composer.lock export-ignore
+/phpunit.xml export-ignore
