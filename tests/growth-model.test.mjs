@@ -17,3 +17,4 @@ test('the newest review counts, whatever the order of the list',()=>assert.equal
 test('reviews of other cadences are ignored',()=>assert.equal(nextReview({reviews:[review('weekly','2026-01-01'),review('monthly','2026-02-01')]},'weekly'),'2026-01-08'));
 test('a cadence with no review yet is due today',(t)=>{t.mock.timers.enable({apis:['Date'],now:Date.UTC(2026,0,15,12)});assert.equal(nextReview({reviews:[review('monthly','2026-01-01')]},'weekly'),'2026-01-15')});
 test('no reviews at all is due today',(t)=>{t.mock.timers.enable({apis:['Date'],now:Date.UTC(2026,0,15,12)});assert.equal(nextReview({reviews:[]},'weekly'),'2026-01-15')});
+test('an unknown cadence returns null instead of throwing',()=>{assert.equal(nextReview({reviews:[review('daily','2026-01-01')]},'daily'),null);assert.equal(nextReview({reviews:[]},'unknown'),null)});
