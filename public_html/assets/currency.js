@@ -16,6 +16,11 @@
     { code: 'JPY', name: 'Japanese yen', unit: 'JPY' },
     { code: 'CNY', name: 'Chinese yuan', unit: 'CNY' },
     { code: 'INR', name: 'Indian rupee', unit: 'INR' },
+    { code: 'BRL', name: 'Brazilian real', unit: 'BRL' },
+    { code: 'MXN', name: 'Mexican peso', unit: 'MXN' },
+    { code: 'ARS', name: 'Argentine peso', unit: 'ARS' },
+    { code: 'CLP', name: 'Chilean peso', unit: 'CLP' },
+    { code: 'COP', name: 'Colombian peso', unit: 'COP' },
   ];
 
   function current() {
