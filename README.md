@@ -237,11 +237,13 @@ If Edi Life OS is useful to you, consider supporting its development with a dona
 
 **[Donate through Donatr](https://donatr.ee/edicodes)** — choose an available donation method on my public page.
 
-You can also donate directly to this public receiving address:
+You can also donate directly to these public receiving addresses:
 
 | Cryptocurrency | Network | Receiving address |
 | --- | --- | --- |
 | Bitcoin (BTC) | Bitcoin (on-chain) | `bc1qdwdpeqv0l8ala8tm46rtfeghuxl70een84npj3` |
+| Ether (ETH) | Ethereum mainnet | `0x695CCF873d51E4C2dC1321b405C63BFE99c5a536` |
+| Solana (SOL) | Solana mainnet | `C2d9u9nY2hZfxsi5Fwz1o5VjGGQujWmxeqZ3upKvHBfD` |
 
 Send only the listed cryptocurrency on the specified network.
 
