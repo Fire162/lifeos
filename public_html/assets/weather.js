@@ -56,7 +56,7 @@ function renderWeather(data) {
   $('kish-weather-feels').textContent = finite(current.apparent_temperature) ? `${Math.round(current.apparent_temperature)}°C` : '—';
   $('kish-weather-wind').textContent = finite(current.wind_speed_10m) ? `${Math.round(current.wind_speed_10m)} km/h ${windDirection(current.wind_direction_10m)}`.trim() : '—';
   $('kish-weather-humidity').textContent = finite(current.relative_humidity_2m) ? `${Math.round(current.relative_humidity_2m)}%` : '—';
-  $('kish-weather-updated').textContent = `Updated ${current.time?.slice(11, 16) || '—'} · Qeshm local time`;
+  $('kish-weather-updated').textContent = `Updated ${current.time?.slice(11, 16) || '—'} · local time`;
   const dayNames = new Intl.DateTimeFormat('en-US', { weekday: 'short', timeZone: 'UTC' });
   const days = daily.time.slice(1, 8).map((date, index) => {
     const i = index + 1;
@@ -104,6 +104,8 @@ export function refreshWeatherCard() {
   lastAttempt = Date.now();
   card.setAttribute('aria-busy', 'true');
   inFlight = getJson().then(data => {
+    const label = $('kish-weather-title');
+    if (label && typeof data.location === 'string') label.textContent = data.location;
     try { renderWeather(data.weather); }
     catch { showWeatherUnavailable(); }
     try { renderMarine(data.marine); }
@@ -124,7 +126,7 @@ function showWeatherUnavailable() {
   $('kish-weather-wind').textContent = '—';
   $('kish-weather-humidity').textContent = '—';
   $('kish-weather-forecast').querySelector('.kish-forecast-days').textContent = '7-day forecast unavailable';
-  $('kish-weather-updated').textContent = 'Qeshm local time · Asia/Tehran';
+  $('kish-weather-updated').textContent = 'Local forecast unavailable';
 }
 
 function showMarineUnavailable() {

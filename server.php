@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/auth.php';
+require_once __DIR__ . '/lib/http_cache.php';
 
 // Every request passes through here, so set browser security headers once.
 // The dashboard embeds each app in a same-origin iframe, hence 'self' framing.
@@ -96,7 +97,7 @@ if (!isset($extensions[$extension]) || str_contains($resolved, DIRECTORY_SEPARAT
     return true;
 }
 header('Content-Type: ' . $extensions[$extension] . ($extension === 'html' || $extension === 'css' || $extension === 'js' || $extension === 'mjs' ? '; charset=utf-8' : ''));
-header('Cache-Control: private, no-store');
+header('Cache-Control: ' . life_os_static_cache($extension, $_GET));
 header('X-Content-Type-Options: nosniff');
 readfile($resolved);
 return true;

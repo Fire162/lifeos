@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+require_once __DIR__ . '/runtime_config.php';
+
 final class ApiException extends RuntimeException
 {
     public function __construct(public int $status, public string $errorCode, string $message, public array $details = [])
@@ -16,6 +18,12 @@ function api_json(mixed $data, int $status = 200): never
 }
 
 function api_reply(array $payload, int $status): never
+{
+    life_os_json_reply($payload, $status);
+}
+
+/** JSON transport shared by browser and bearer endpoints; payloads stay unchanged. */
+function life_os_json_reply(array $payload, int $status = 200): never
 {
     http_response_code($status);
     header('Content-Type: application/json; charset=utf-8');
@@ -65,7 +73,7 @@ function api_uuid(): string
 }
 
 function api_now(): int { return (int) floor(microtime(true) * 1000); }
-function api_today(): string { return (new DateTimeImmutable('now', new DateTimeZone('Asia/Tehran')))->format('Y-m-d'); }
+function api_today(): string { return (new DateTimeImmutable('now', new DateTimeZone(life_os_timezone())))->format('Y-m-d'); }
 
 function api_fields(array $body, array $allowed): void
 {

@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/auth.php';
+require_once __DIR__ . '/lib/api_response.php';
 require_once __DIR__ . '/lib/state_store.php';
 life_os_require_auth();
 header('Content-Type: application/json; charset=utf-8');
@@ -11,9 +12,7 @@ header('X-Content-Type-Options: nosniff');
 
 function state_reply(array $payload, int $status = 200): never
 {
-    http_response_code($status);
-    echo json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-    exit;
+    life_os_json_reply($payload, $status);
 }
 
 try {
@@ -38,10 +37,7 @@ try {
         state_reply(['data' => $data, 'revisions' => $revisions, 'csrf' => $_SESSION['state_csrf']]);
     }
     if ($method !== 'PUT') state_reply(['error' => 'Method not allowed'], 405);
-    life_os_start_session();
-    if (empty($_SESSION['state_csrf']) || !hash_equals((string) $_SESSION['state_csrf'], (string) ($_SERVER['HTTP_X_CSRF_TOKEN'] ?? ''))) {
-        state_reply(['error' => 'Invalid request token'], 403);
-    }
+    life_os_require_csrf(fn () => state_reply(['error' => 'Invalid request token'], 403));
     $raw = (string) file_get_contents('php://input');
     if (strlen($raw) > 2_000_000) state_reply(['error' => 'Data too large'], 413);
     $payload = json_decode($raw, true);
