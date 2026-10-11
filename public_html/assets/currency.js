@@ -16,6 +16,14 @@
     { code: 'JPY', name: 'Japanese yen', unit: 'JPY' },
     { code: 'CNY', name: 'Chinese yuan', unit: 'CNY' },
     { code: 'INR', name: 'Indian rupee', unit: 'INR' },
+    { code: 'SAR', name: 'Saudi riyal', unit: 'SAR' },
+    { code: 'QAR', name: 'Qatari riyal', unit: 'QAR' },
+    { code: 'KWD', name: 'Kuwaiti dinar', unit: 'KWD' },
+    { code: 'EGP', name: 'Egyptian pound', unit: 'EGP' },
+    { code: 'ZAR', name: 'South African rand', unit: 'ZAR' },
+    { code: 'NGN', name: 'Nigerian naira', unit: 'NGN' },
+    { code: 'PKR', name: 'Pakistani rupee', unit: 'PKR' },
+    { code: 'BDT', name: 'Bangladeshi taka', unit: 'BDT' },
   ];
 
   function current() {
