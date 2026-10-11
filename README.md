@@ -237,6 +237,8 @@ If Edi Life OS is useful to you, consider supporting its development with a dona
 
 **[Donate through Donatr](https://donatr.ee/edicodes)** — choose an available donation method on my public page.
 
+[Toman payment Gateway](https://edrisranjbar.ir/donation)
+
 You can also donate directly to these public receiving addresses:
 
 | Cryptocurrency | Network | Receiving address |
