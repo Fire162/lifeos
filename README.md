@@ -237,6 +237,14 @@ If Edi Life OS is useful to you, consider supporting its development with a dona
 
 **[Donate through Donatr](https://donatr.ee/edicodes)** — choose an available donation method on my public page.
 
+You can also donate directly to this public receiving address:
+
+| Cryptocurrency | Network | Receiving address |
+| --- | --- | --- |
+| Bitcoin (BTC) | Bitcoin (on-chain) | `bc1qdwdpeqv0l8ala8tm46rtfeghuxl70een84npj3` |
+
+Send only the listed cryptocurrency on the specified network.
+
 ## Contact
 
 For questions, feedback or collaboration, email **[edris.qeshm2@gmail.com](mailto:edris.qeshm2@gmail.com)**.
