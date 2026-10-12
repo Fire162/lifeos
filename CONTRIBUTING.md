@@ -26,9 +26,16 @@ php -S localhost:8000 -t public_html server.php
 ## Run the checks
 
 ```sh
-node --test tests/timer.test.mjs
+node --test tests/*.test.mjs
+composer install
+vendor/bin/phpunit
+php tests/proxy_test.php
+php tests/habittify_rollback_test.php
 php tests/api_test.php
 php tests/obligations_test.php
+php tests/logout_test.php
+php tests/credentials_test.php
+php tests/habittify_logs_test.php
 npm ci --prefix mcp && npm test --prefix mcp
 ```
 

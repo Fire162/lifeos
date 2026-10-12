@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Settings · Edi Life OS</title>
-  <script src="/assets/storage.js?v=currency-1"></script>
-  <script src="/assets/currency.js?v=currency-2"></script>
+  <script src="/assets/storage.js?v=issue19-1"></script>
+  <script src="/assets/currency.js?v=currency-4"></script>
   <link rel="stylesheet" href="../assets/base.css">
   <style>
     main{max-width:680px;margin:0 auto;padding:48px 22px 80px}
@@ -21,8 +21,8 @@
     .divider{border-top:1px solid var(--border);margin:26px 0 0}
     button{margin-top:24px;padding:12px 20px;background:var(--accent);color:var(--bg);border:0;border-radius:4px;font:600 14px Inter,system-ui,sans-serif;cursor:pointer}
     button:disabled{opacity:.6;cursor:wait}
-    #message,#currencyMessage{min-height:24px;margin-top:18px;font-size:13px}
-    #message.error,#currencyMessage.error{color:var(--danger)}#message.success,#currencyMessage.success{color:var(--good)}
+    #message,#currencyMessage,#signOutMessage{min-height:24px;margin-top:18px;font-size:13px}
+    #message.error,#currencyMessage.error,#signOutMessage.error{color:var(--danger)}#message.success,#currencyMessage.success{color:var(--good)}
     @media(max-width:600px){main{padding:28px 16px 56px}.card{padding:20px}}
   </style>
 </head>
@@ -56,11 +56,19 @@
         <p id="message" role="status" aria-live="polite"></p>
       </form>
     </section>
+    <section class="card" aria-labelledby="session-title">
+      <h2 id="session-title">Current session</h2>
+      <p>Sign out of Life OS on this browser.</p>
+      <button id="signOut" type="button" disabled>Sign out</button>
+      <p id="signOutMessage" role="status" aria-live="polite"></p>
+    </section>
   </main>
   <script>
     const form = document.getElementById('credentialsForm');
     const message = document.getElementById('message');
     const save = document.getElementById('save');
+    const signOut = document.getElementById('signOut');
+    const signOutMessage = document.getElementById('signOutMessage');
     let csrf = '';
     function status(text, kind = '') { message.textContent = text; message.className = kind; }
     async function readResponse(response) {
@@ -73,6 +81,7 @@
         const data = await readResponse(await fetch('../credentials.php', {headers: {'Accept':'application/json'}, cache:'no-store'}));
         document.getElementById('username').value = data.username;
         csrf = data.csrf;
+        signOut.disabled = false;
       } catch (error) {
         status(error.message, 'error');
         save.disabled = true;
@@ -102,6 +111,25 @@
       finally { save.disabled = false; }
     });
     load();
+
+    signOut.addEventListener('click', async () => {
+      signOut.disabled = true;
+      signOutMessage.className = '';
+      signOutMessage.textContent = 'Signing out…';
+      try {
+        const data = await readResponse(await fetch('/logout.php', {
+          method: 'POST',
+          redirect: 'error',
+          headers: {'Accept': 'application/json', 'X-CSRF-Token': csrf}
+        }));
+        if (data.ok !== true) throw new Error('Could not sign out. Please try again.');
+        window.top.location.href = '/login.php';
+      } catch (error) {
+        signOutMessage.textContent = error.message;
+        signOutMessage.className = 'error';
+        signOut.disabled = false;
+      }
+    });
 
     const currencySelect = document.getElementById('currency');
     const currencyMessage = document.getElementById('currencyMessage');
