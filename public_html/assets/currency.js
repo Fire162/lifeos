@@ -16,6 +16,11 @@
     { code: 'JPY', name: 'Japanese yen', unit: 'JPY' },
     { code: 'CNY', name: 'Chinese yuan', unit: 'CNY' },
     { code: 'INR', name: 'Indian rupee', unit: 'INR' },
+    { code: 'SEK', name: 'Swedish krona', unit: 'SEK' },
+    { code: 'NOK', name: 'Norwegian krone', unit: 'NOK' },
+    { code: 'DKK', name: 'Danish krone', unit: 'DKK' },
+    { code: 'PLN', name: 'Polish zloty', unit: 'PLN' },
+    { code: 'CZK', name: 'Czech koruna', unit: 'CZK' },
   ];
 
   function current() {
