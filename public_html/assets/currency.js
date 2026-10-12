@@ -21,6 +21,11 @@
     { code: 'DKK', name: 'Danish krone', unit: 'DKK' },
     { code: 'PLN', name: 'Polish zloty', unit: 'PLN' },
     { code: 'CZK', name: 'Czech koruna', unit: 'CZK' },
+    { code: 'BRL', name: 'Brazilian real', unit: 'BRL' },
+    { code: 'MXN', name: 'Mexican peso', unit: 'MXN' },
+    { code: 'ARS', name: 'Argentine peso', unit: 'ARS' },
+    { code: 'CLP', name: 'Chilean peso', unit: 'CLP' },
+    { code: 'COP', name: 'Colombian peso', unit: 'COP' },
   ];
 
   function current() {
