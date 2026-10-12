@@ -1,4 +1,5 @@
-const escape = value => String(value ?? '').replace(/[&<>"']/g, character => ({'&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'}[character]));
+import '../assets/html-escape.js?v=issue19-1';
+const escape = globalThis.lifeOsHtml.escapeHtml;
 const pct = value => value === null ? 'Not measured' : `${value}%`;
 
 export function createReviewStepper(dialog, dimensions) {

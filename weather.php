@@ -22,10 +22,25 @@ if (!function_exists('curl_multi_init')) {
     return;
 }
 
-// Qeshm city and a nearby sea cell east of the island. Tide values are modeled, not gauge readings.
+require_once __DIR__ . '/lib/runtime_config.php';
+try {
+    $coordinates = life_os_weather_coordinates();
+    $timezone = life_os_timezone();
+    $location = (string) life_os_setting('weather_location', 'LIFEOS_WEATHER_LOCATION', 'Qeshm');
+} catch (Throwable $error) {
+    error_log('LifeOS weather configuration: ' . get_class($error));
+    http_response_code(503); echo json_encode(['error' => 'Weather configuration is invalid.']); return;
+}
+// Marine forecasts are estimates for the nearest sea cell, not gauge readings.
+$common = $coordinates + ['timezone' => $timezone];
 $urls = [
-    'weather' => 'https://api.open-meteo.com/v1/forecast?latitude=26.9492&longitude=56.2691&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m,wind_direction_10m,is_day&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=Asia%2FTehran&forecast_days=8',
-    'marine' => 'https://marine-api.open-meteo.com/v1/marine?latitude=26.94&longitude=56.35&hourly=sea_level_height_msl&current=sea_level_height_msl&timezone=Asia%2FTehran&forecast_days=2&cell_selection=sea',
+    'weather' => 'https://api.open-meteo.com/v1/forecast?' . http_build_query($common + [
+        'current' => 'temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m,wind_direction_10m,is_day',
+        'daily' => 'weather_code,temperature_2m_max,temperature_2m_min', 'forecast_days' => 8,
+    ]),
+    'marine' => 'https://marine-api.open-meteo.com/v1/marine?' . http_build_query($common + [
+        'hourly' => 'sea_level_height_msl', 'current' => 'sea_level_height_msl', 'forecast_days' => 2, 'cell_selection' => 'sea',
+    ]),
 ];
 
 $multi = curl_multi_init();
@@ -56,7 +71,7 @@ do {
     }
 } while ($active && $status === CURLM_OK);
 
-$result = ['weather' => null, 'marine' => null];
+$result = ['weather' => null, 'marine' => null, 'location' => $location, 'timezone' => $timezone];
 foreach ($handles as $name => $handle) {
     $body = curl_multi_getcontent($handle);
     if (curl_errno($handle) === 0 && curl_getinfo($handle, CURLINFO_RESPONSE_CODE) === 200 && is_string($body)) {

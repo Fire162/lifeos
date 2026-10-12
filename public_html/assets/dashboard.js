@@ -1,7 +1,8 @@
+import './html-escape.js?v=issue19-1';
 import './goal-progress.js';
-import { refreshWeatherCard } from './weather.js?v=weather-7d-1';
+import { refreshWeatherCard } from './weather.js?v=issue19-1';
 import { remainingSeconds } from './timer.mjs';
-import { mountGrowthOverview, refreshGrowthOverview } from './growth-overview.js?v=goals-habits-1';
+import { mountGrowthOverview, refreshGrowthOverview } from './growth-overview.js?v=issue19-1';
 
 const readJson = (key) => {
   try { return JSON.parse(appStorage.getItem(key) || 'null'); } catch { return null; }
@@ -9,7 +10,7 @@ const readJson = (key) => {
 const number = (value) => new Intl.NumberFormat('en-US').format(Number(value) || 0);
 const $ = (id) => document.getElementById(id);
 // Escape stored text before it goes into innerHTML templates.
-const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const esc = globalThis.lifeOsHtml.escapeHtml;
 const set = (id, value) => { const node = $(id); if (node) node.textContent = value; };
 const isArray = (value) => Array.isArray(value);
 const safeArray = (value) => isArray(value) ? value : [];
@@ -60,7 +61,7 @@ function smoothPath(points) {
 export function mountDashboard() {
   const stylesheet = document.createElement('link');
   stylesheet.rel = 'stylesheet';
-  stylesheet.href = 'assets/dashboard.css?v=growth-1';
+  stylesheet.href = 'assets/dashboard.css?v=issue19-1';
   document.head.append(stylesheet);
   const nav = document.querySelector('.os-nav nav');
   const overview = document.createElement('a');
@@ -112,13 +113,13 @@ export function mountDashboard() {
 
     <section class="kish-weather dash-card" id="kish-weather" aria-labelledby="kish-weather-title" aria-busy="true">
       <div class="kish-weather-glow" aria-hidden="true"></div>
-      <div class="kish-weather-header"><div><span class="card-kicker">ISLAND WEATHER</span><h2 id="kish-weather-title">Qeshm Island</h2></div><span class="kish-weather-live" id="kish-weather-status"><i></i> Loading forecast</span></div>
+      <div class="kish-weather-header"><div><span class="card-kicker">LOCAL WEATHER</span><h2 id="kish-weather-title">Local forecast</h2></div><span class="kish-weather-live" id="kish-weather-status"><i></i> Loading forecast</span></div>
       <div class="kish-weather-main">
         <div class="kish-weather-now"><div class="kish-weather-icon" id="kish-weather-icon" aria-hidden="true"></div><div><div class="kish-weather-temperature" id="kish-weather-temperature">—<small>°C</small></div><p id="kish-weather-condition">Fetching current conditions…</p></div></div>
         <div class="kish-weather-details"><div><span>FEELS LIKE</span><strong id="kish-weather-feels">—</strong></div><div><span>WIND</span><strong id="kish-weather-wind">—</strong></div><div><span>HUMIDITY</span><strong id="kish-weather-humidity">—</strong></div></div>
       </div>
       <div class="kish-weather-bottom"><div class="kish-weather-tide"><div class="kish-tide-icon" aria-hidden="true">≈</div><div><span class="kish-weather-label">SEA LEVEL · MODELED TIDE</span><strong id="kish-tide-state">Loading sea conditions…</strong><small id="kish-tide-detail">Near Qeshm · above mean sea level</small></div></div><div class="kish-weather-forecast" id="kish-weather-forecast" aria-label="Next seven days forecast"><span class="kish-weather-label">NEXT 7 DAYS</span><div class="kish-forecast-days"><span>Loading forecast…</span></div></div></div>
-      <div class="kish-weather-footer"><span id="kish-weather-updated">Qeshm local time · Asia/Tehran</span><span>Coastal tide estimate; not for navigation · <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Open-Meteo</a> / <a href="https://open-meteo.com/en/docs/marine-weather-api" target="_blank" rel="noopener noreferrer">DWD</a></span></div>
+      <div class="kish-weather-footer"><span id="kish-weather-updated">Loading local forecast</span><span>Coastal tide estimate; not for navigation · <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Open-Meteo</a> / <a href="https://open-meteo.com/en/docs/marine-weather-api" target="_blank" rel="noopener noreferrer">DWD</a></span></div>
     </section>
 
     <section class="dash-row" aria-label="Focus and habit charts">
