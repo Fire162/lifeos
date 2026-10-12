@@ -157,6 +157,17 @@ Abre [localhost:8000](http://localhost:8000) e inicia sesión. Las tablas se gen
 | Servidor MCP | Opcional: **Node.js 22.9+** |
 | Pruebas de API | Opcional: `pdo_sqlite` |
 
+### Servidor MCP
+
+```sh
+cd mcp
+npm ci
+cp .env.example .env   # define LIFEOS_BASE_URL y LIFEOS_API_TOKEN
+npm start
+```
+
+El servidor funciona a través de **stdio**; no existe un punto de conexión MCP alojado. La [guía de MCP](mcp/README.md) lista cada herramienta y muestra la configuración de clientes para Claude y Codex.
+
 ## Licencia
 
 [MIT](LICENSE) © 2026 Edris Ranjbar. Úsalo, crea bifurcaciones y amplíalo.
