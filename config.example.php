@@ -7,10 +7,15 @@ return [
     'db_name' => 'your_database_name',
     'db_user' => 'your_database_user',
     'db_password' => 'your_database_password',
+    // First-run sign-in only. Both may be removed once app_credentials is seeded.
     'username' => 'your_app_username',
     'password' => 'your_app_password',
     'api_token' => 'replace-with-a-long-random-token',
     'api_allow_secret_notes' => false,
+    'timezone' => 'Asia/Tehran',
+    'weather_latitude' => 26.9492,
+    'weather_longitude' => 56.2691,
+    'weather_location' => 'Qeshm',
     // true only behind a TLS-terminating reverse proxy you control.
     'trust_proxy' => false,
 ];

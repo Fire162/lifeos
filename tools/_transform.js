@@ -4,8 +4,8 @@
 const fs = require('fs');
 const path = require('path');
 
-const ROOT = 'C:/Users/edi/Documents/ChatGPT/Edi Life OS';
-const enMap = JSON.parse(fs.readFileSync(path.join(ROOT, '_en_map.json'), 'utf8'));
+const ROOT = path.resolve(__dirname, '..');
+const enMap = JSON.parse(fs.readFileSync(path.join(__dirname, '_en_map.json'), 'utf8'));
 
 const esc = (s) =>
   s.replace(/\\/g, '\\\\')
@@ -33,6 +33,6 @@ script = script.replace(/t\(\s*'([a-zA-Z0-9_]+)'\s*,\s*\{([\s\S]*?)\}\s*\)/g,
 script = script.replace(/t\(\s*'([a-zA-Z0-9_]+)'\s*\)/g,
   (m, key) => enMap[key] != null ? `"${esc(enMap[key])}"` : m);
 
-fs.writeFileSync(path.join(ROOT, '_script_step1.js'), script);
+fs.writeFileSync(path.join(__dirname, '_script_step1.js'), script);
 console.log('Remaining t( calls:', (script.match(/\bt\(/g) || []).length);
 console.log('Inserted __t( calls:', (script.match(/__t\(/g) || []).length);

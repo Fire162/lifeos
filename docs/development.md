@@ -18,12 +18,27 @@ npm ci --prefix mcp
 
 ## Verification
 
+Session write endpoints share `life_os_require_csrf()` in `auth.php`. Its optional failure callback preserves an endpoint's existing error response or API exception; returning from that callback still rejects the request with HTTP `403`. It validates the session token with `hash_equals` and does not create a missing token.
+
+The browser Habittify endpoint (`GET /habittify/api.php?route=logs&start=YYYY-MM-DD&end=YYYY-MM-DD`) requires both dates to be real, zero-padded ISO calendar dates and `start <= end`. Missing, malformed, impossible or reversed dates return HTTP `400` with the existing `{ "error": "..." }` shape before querying logs. Valid ranges remain inclusive; a single-day range is allowed. This session-authenticated endpoint is separate from the bearer-token API.
+
+Authentication backend failures return an unauthenticated result and write a `LifeOS authentication failed:` diagnostic to PHP's error log with the exception type, code and source location. Exception messages and traces are omitted because they can contain credentials. Ordinary expired or invalid sessions do not produce this diagnostic.
+
+Settings includes a **Sign out** button that sends `POST /logout.php` with the session's `X-CSRF-Token`. Other methods return `405` with `Allow: POST`; a missing or invalid token returns `403` without ending the session. A valid request destroys the session and expires its cookie, returning `{ "ok": true }` when `Accept: application/json` is sent, or a `303` redirect to `/login.php` otherwise. The logout HTTP tests use a temporary PHP server and disposable sessions without loading application configuration or connecting to MySQL.
+
 Tests never load the repository config.php or production credentials:
 
 ```sh
-node --test tests/timer.test.mjs
+node --test tests/*.test.mjs
+composer install
+vendor/bin/phpunit
+php tests/proxy_test.php
 php tests/api_test.php
 php tests/obligations_test.php
+php tests/logout_test.php
+php tests/credentials_test.php
+php tests/habittify_logs_test.php
+php tests/habittify_rollback_test.php
 cd mcp && npm test
 ```
 
@@ -72,6 +87,46 @@ Remove-Item Env:LIFEOS_TEST_BASE_URL
 Use the disposable fixture server described above. These checks do not verify production Apache configuration or every supported PHP version.
 
 ## Implementation boundaries
+
+### Migrations and operator settings
+
+Run `php migrate.php` before serving an upgrade (in Docker, use
+`docker compose exec web php migrate.php`). Requests also apply pending versions
+under a database advisory lock for shared-host compatibility; current installs
+only read the schema version. Migration history is in `schema_migrations`.
+Migrations preserve existing state, IDs and credentials, and seed default habits
+only when creating the habits table. Deleting every habit never reseeds it.
+Back up the database before deployment; MySQL DDL is not transactionally reversible.
+
+After first setup, remove `username`/`password` from config.php or clear
+`LIFEOS_USERNAME`/`LIFEOS_PASSWORD` in Docker. Existing sessions with the old
+plaintext fingerprint must sign in again. Credentials are stored in MySQL.
+
+`timezone`, `weather_latitude`, `weather_longitude`, and `weather_location` can
+be configured in config.php; the `LIFEOS_TIMEZONE`, `LIFEOS_WEATHER_LATITUDE`,
+`LIFEOS_WEATHER_LONGITUDE`, and `LIFEOS_WEATHER_LOCATION` environment variables
+override them. The timezone controls server `api_today()` and weather forecasts.
+Existing browser calendar views still use Tehran dates.
+
+Run `php tests/migrations_test.php 3308` against an isolated local MySQL server
+(set `LIFEOS_TEST_DB_PASSWORD` if required) to verify upgrade preservation and
+one-time seeding. It creates and removes only randomly named test databases.
+
+See [ownership.md](ownership.md) for the single-owner design decision and the
+prerequisites for per-user OAuth integrations.
+
+### Browser scripts
+
+`assets/html-escape.js` supplies the shared text encoder. Classic scripts load it
+before application scripts; ES modules import it. Kanban loads its state,
+rendering, editing, drag/drop and card modules in the explicit HTML order, then
+initializes in app.js. Finance loads state, UI, import, actions, modals and render
+scripts sequentially after storage is ready, then initializes in script.js.
+Public action handlers retain their names for existing HTML event handlers.
+
+Authenticated HTML/API responses are not cached. Static assets use private
+one-hour caching, or one-year immutable caching with a version query. Always
+change the version when changing an asset or its imported modules.
 
 - Keep browser and API representations compatible; preserve existing metadata when updating records.
 - Deploy revision-aware state handling and its browser client together.

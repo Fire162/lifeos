@@ -9,3 +9,5 @@ node_modules/
 .env.*
 !.env.example
 /config.test.php
+/vendor/
+/.phpunit.cache/

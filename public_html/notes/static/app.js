@@ -95,11 +95,7 @@ function persist() {
   }
 }
 
-function escapeHtml(value) {
-  return value.replace(/[&<>"']/g, (character) => ({
-    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
-  })[character]);
-}
+const escapeHtml = globalThis.lifeOsHtml.escapeHtml;
 
 function renderInline(value) {
   let html = escapeHtml(value);

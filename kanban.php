@@ -8,9 +8,7 @@ life_os_require_auth();
 
 try {
     api_method(['POST'], $_SERVER['REQUEST_METHOD'] ?? 'GET');
-    if (empty($_SESSION['state_csrf']) || !hash_equals((string) $_SESSION['state_csrf'], (string) ($_SERVER['HTTP_X_CSRF_TOKEN'] ?? ''))) {
-        throw new ApiException(403, 'invalid_request_token', 'Invalid request token. Reload and try again.');
-    }
+    life_os_require_csrf(fn () => throw new ApiException(403, 'invalid_request_token', 'Invalid request token. Reload and try again.'));
     $body = api_body();
     api_fields($body, ['source_board_id', 'source_column_id', 'card_id', 'destination_board_id', 'destination_column_id', 'revision']);
     foreach (['source_board_id', 'source_column_id', 'card_id', 'destination_board_id', 'destination_column_id'] as $field) {

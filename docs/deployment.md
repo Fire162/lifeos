@@ -19,6 +19,12 @@ The `app` service has a healthcheck that requests `/login.php`, so `docker compo
 
 Put a TLS-terminating reverse proxy (Caddy, Traefik, nginx) in front of the container before exposing it to the internet, and set `LIFEOS_TRUST_PROXY=true`. The app then marks the session cookie `Secure` based on `X-Forwarded-Proto` and rate-limits sign-in per client using the last `X-Forwarded-For` address. Leave it `false` when the container is reachable directly, because those headers could otherwise be spoofed.
 
+## Sign-in credentials after setup
+
+The configured sign-in `username` and `password` (Docker: `LIFEOS_USERNAME` and `LIFEOS_PASSWORD`) are required only when creating the initial `app_credentials` row. After setup, you can remove these bootstrap values from `config.php` or `.env`; keep all database connection credentials. For Docker, recreate the app container to remove the old values from its environment. Login and session validation use the username and password hash stored in MySQL; changing bootstrap values does not reset an existing account. Manage sign-in credentials in Settings.
+
+An empty credentials table still requires non-empty bootstrap values and fails with an explicit setup error if either is missing. Restore the credentials row with your database backup when recovering an installation. Sessions from the old plaintext configuration fingerprint are no longer upgraded and must sign in again; sessions already using the stored credential hash continue to work.
+
 ## Shared hosting release zip
 
 Each tagged release publishes `lifeos-<version>.zip` on GitHub Releases, built with `git archive` (development files are excluded via `.gitattributes`). Its layout matches typical cPanel hosting:
@@ -78,9 +84,63 @@ Back up these resources together:
 
 - The MySQL database, including `app_state`, habit tables, sign-in credentials, and attachment metadata.
 - Private attachment files.
-- Deployment configuration, stored securely outside the repository.
+- Deployment configuration (`.env` or `config.php`), stored securely outside the repository.
 
-Attachment files are stored outside the public directory in a `.lifeos-files-*` directory derived from the backend location. Moving the backend can change that derived path; restore the uploaded files into the directory used by the new deployment.
+> **Note**: Backups contain private notes, credentials, and attachments. Store backup files securely with restricted file permissions.
+
+### Docker backup commands
+
+From the directory containing your `docker-compose.yml` and `.env`:
+
+1. **Dump the MySQL database**:
+   ```sh
+   docker compose exec -T db sh -c 'exec mysqldump -u lifeos -p"$MYSQL_PASSWORD" lifeos' > lifeos-db-backup.sql
+   ```
+   *(Or using root credentials: `docker compose exec -T db sh -c 'exec mysqldump -u root -p"$MYSQL_ROOT_PASSWORD" lifeos' > lifeos-db-backup.sql`)*
+
+2. **Back up the attachments volume**:
+   ```sh
+   docker run --rm -v lifeos_attachments:/data/attachments -v "$(pwd)":/backup alpine tar czf /backup/lifeos-attachments-backup.tar.gz -C /data/attachments .
+   ```
+   *(If your Compose project name differs from `lifeos`, use `docker volume ls` to find your `<project>_attachments` volume name).*
+
+3. **Back up configuration**:
+   ```sh
+   cp .env lifeos-env-backup
+   ```
+
+### Docker restore commands
+
+To restore into a fresh installation:
+
+1. **Restore configuration and start database container**:
+   ```sh
+   cp lifeos-env-backup .env
+   docker compose up -d db
+   ```
+
+2. **Restore MySQL database**:
+   ```sh
+   docker compose exec -T db sh -c 'exec mysql -u lifeos -p"$MYSQL_PASSWORD" lifeos' < lifeos-db-backup.sql
+   ```
+
+3. **Restore attachments volume**:
+   ```sh
+   docker run --rm -v lifeos_attachments:/data/attachments -v "$(pwd)":/backup alpine tar xzf /backup/lifeos-attachments-backup.tar.gz -C /data/attachments
+   ```
+
+4. **Start all services**:
+   ```sh
+   docker compose up -d
+   ```
+
+### Verify your backup
+
+To verify that the backup is valid and intact:
+1. Run `docker compose ps` and confirm both `app` and `db` report `healthy`.
+2. Open `http://localhost:8080` (or your configured `LIFEOS_PORT`), sign in with your credentials, and verify existing habits, notes, and boards display as expected.
+
+Attachment files are stored outside the public directory in a `.lifeos-files-*` directory derived from the backend location (or mounted at `/data/attachments` in the container). Moving the backend can change that derived path; restore the uploaded files into the directory used by the new deployment.
 
 Existing browser data is imported once. Conflicting older snapshots are retained as `legacy_backup_*` rows in `app_state`. Preserve these records when backing up or migrating.
 

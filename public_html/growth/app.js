@@ -1,8 +1,9 @@
-import {KEY, dimensions, array, documentState, sources, habitData, summary, goalProgress, today, nextReview} from '../assets/growth-model.js?v=goals-habits-1';
-import {createReviewStepper} from './review-stepper.js?v=1';
-import {shareReviewImage} from './share-image.js?v=1';
+import '../assets/html-escape.js?v=issue19-1';
+import {KEY, dimensions, array, documentState, sources, habitData, summary, goalProgress, today, nextReview} from '../assets/growth-model.js?v=issue19-1';
+import {createReviewStepper} from './review-stepper.js?v=issue19-1';
+import {shareReviewImage} from './share-image.js?v=issue19-1';
 const $=id=>document.getElementById(id);
-const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const esc = globalThis.lifeOsHtml.escapeHtml;
 const prettyDate=value=>value && !Number.isNaN(new Date(value+'T12:00:00Z').getTime())?new Intl.DateTimeFormat('en-GB',{day:'numeric',month:'short',year:'numeric',timeZone:'UTC'}).format(new Date(value+'T12:00:00Z')):'No target date';
 let selected=dimensions.some(d=>d.id===location.hash.slice(1))?location.hash.slice(1):'spirituality';
 let doc, source, habit=null, editing=null, baseline=null, refreshSequence=0, refreshing=false;
