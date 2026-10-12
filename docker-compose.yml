@@ -1,5 +1,5 @@
 # Run Edi Life OS with MySQL:
-#   cp .env.example .env   (then set your sign-in and passwords; all four are required)
+#   cp .env.example .env   (then set your sign-in and passwords; initial sign-in values are needed only on first setup)
 #   docker compose up -d
 # Open http://localhost:8080
 services:
@@ -14,11 +14,15 @@ services:
       LIFEOS_DB_NAME: lifeos
       LIFEOS_DB_USER: lifeos
       LIFEOS_DB_PASSWORD: ${LIFEOS_DB_PASSWORD:?}
-      LIFEOS_USERNAME: ${LIFEOS_USERNAME:?}
-      LIFEOS_PASSWORD: ${LIFEOS_PASSWORD:?}
+      LIFEOS_USERNAME: ${LIFEOS_USERNAME:-}
+      LIFEOS_PASSWORD: ${LIFEOS_PASSWORD:-}
       LIFEOS_API_TOKEN: ${LIFEOS_API_TOKEN:-}
       LIFEOS_TRUST_PROXY: ${LIFEOS_TRUST_PROXY:-false}
-      TZ: Asia/Tehran
+      LIFEOS_TIMEZONE: ${LIFEOS_TIMEZONE:-Asia/Tehran}
+      LIFEOS_WEATHER_LATITUDE: ${LIFEOS_WEATHER_LATITUDE:-26.9492}
+      LIFEOS_WEATHER_LONGITUDE: ${LIFEOS_WEATHER_LONGITUDE:-56.2691}
+      LIFEOS_WEATHER_LOCATION: ${LIFEOS_WEATHER_LOCATION:-Qeshm}
+      TZ: ${LIFEOS_TIMEZONE:-Asia/Tehran}
     volumes:
       - attachments:/data/attachments
     depends_on:

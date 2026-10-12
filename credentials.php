@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/auth.php';
+require_once __DIR__ . '/lib/api_response.php';
 life_os_require_auth();
 life_os_start_session();
 
@@ -12,9 +13,7 @@ header('X-Content-Type-Options: nosniff');
 
 function credentials_reply(array $payload, int $status = 200): never
 {
-    http_response_code($status);
-    echo json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-    exit;
+    life_os_json_reply($payload, $status);
 }
 
 $_SESSION['state_csrf'] ??= bin2hex(random_bytes(32));
@@ -36,9 +35,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
     credentials_reply(['error' => 'Method not allowed.'], 405);
 }
 
-if (!hash_equals((string) $_SESSION['state_csrf'], (string) ($_SERVER['HTTP_X_CSRF_TOKEN'] ?? ''))) {
-    credentials_reply(['error' => 'Refresh the page and try again.'], 403);
-}
+life_os_require_csrf(fn () => credentials_reply(['error' => 'Refresh the page and try again.'], 403));
 
 $raw = (string) file_get_contents('php://input');
 if (strlen($raw) > 20_000) credentials_reply(['error' => 'Request is too large.'], 413);

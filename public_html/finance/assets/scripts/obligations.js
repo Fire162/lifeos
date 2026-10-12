@@ -1,8 +1,9 @@
+import '../../../assets/html-escape.js?v=issue19-1';
 // Debts (money you owe) and credits (money owed to you), one-time or recurring.
 // Paying a debt records an expense; receiving a credit records income.
 const KEY='edi_obligations_v1', PERIODS='daramd_periods_v1', LEGACY='daramd_v1';
 const $=id=>document.getElementById(id);
-const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const esc = globalThis.lifeOsHtml.escapeHtml;
 const money=value=>new Intl.NumberFormat('en-US').format(value||0);
 // Unit label from the currency chosen in Settings (amounts are never converted).
 const unit=()=>window.lifeOsCurrency?.unit()??'Toman';
