@@ -2,8 +2,8 @@
 const fs = require('fs');
 const path = require('path');
 
-const ROOT = 'C:/Users/edi/Documents/ChatGPT/Edi Life OS';
-let s = fs.readFileSync(path.join(ROOT, '_script_step1.js'), 'utf8');
+const ROOT = path.resolve(__dirname, '..');
+let s = fs.readFileSync(path.join(__dirname, '_script_step1.js'), 'utf8');
 
 // 1) Replace uiFont() with "Inter" (the default English font)
 s = s.replace(/uiFont\(\)/g, '"Inter"');

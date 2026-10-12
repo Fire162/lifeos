@@ -110,7 +110,7 @@ Edi Life OS incluye un servidor opcional de [MCP](https://modelcontextprotocol.i
 >
 > *"Registra un gasto de 450.000 Toman en comida y muestra mi saldo."*
 
-El servidor MCP se comunica con tu instalación únicamente a través de la API HTTP protegida por token. Nunca accede directamente a tu base de datos ni a tus contraseñas. La configuración toma un minuto: consulta [Servidor MCP](#servidor-mcp) más adelante.
+El servidor MCP se comunica con tu instalación únicamente a través de la API HTTP protegida por token. Nunca accede directamente a tu base de datos ni a tus contraseñas. La configuración toma un minuto: consulta la [guía del servidor MCP](mcp/README.md) (en inglés).
 
 ## Inicio rápido
 

@@ -1,7 +1,7 @@
-import { mountFocusAudio } from './focus-audio.js?v=playlist-1';
+import { mountFocusAudio } from './focus-audio.js?v=issue19-1';
 import { remainingSeconds, nextMode } from './timer.mjs';
-import { mountDashboard, refreshDashboard } from './dashboard.js?v=currency-1';
-import { mountMobileNavigation } from './mobile-nav.js?v=growth-1';
+import { mountDashboard, refreshDashboard } from './dashboard.js?v=issue19-1';
+import { mountMobileNavigation } from './mobile-nav.js?v=issue19-1';
 await window.appStorageReady;
 mountDashboard();
 const $=id=>document.getElementById(id);

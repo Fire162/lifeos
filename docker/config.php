@@ -12,5 +12,9 @@ return [
     'db_password' => $env('LIFEOS_DB_PASSWORD'),
     'username' => $env('LIFEOS_USERNAME'),
     'password' => $env('LIFEOS_PASSWORD'),
+    'timezone' => $env('LIFEOS_TIMEZONE', 'Asia/Tehran'),
+    'weather_latitude' => $env('LIFEOS_WEATHER_LATITUDE', '26.9492'),
+    'weather_longitude' => $env('LIFEOS_WEATHER_LONGITUDE', '56.2691'),
+    'weather_location' => $env('LIFEOS_WEATHER_LOCATION', 'Qeshm'),
     'api_allow_secret_notes' => $env('LIFEOS_API_ALLOW_SECRET_NOTES') === 'true',
 ];

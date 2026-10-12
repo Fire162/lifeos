@@ -1,9 +1,7 @@
 const KEY = 'edi_notepad_v1';
 const $ = id => document.getElementById(id);
 
-function escapeHtml(value) {
-  return String(value).replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
-}
+const escapeHtml = globalThis.lifeOsHtml.escapeHtml;
 
 // Ignore code and link destinations when choosing the note's main writing direction.
 function noteDirection(source) {

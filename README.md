@@ -6,7 +6,7 @@
 
 [![Latest release](https://img.shields.io/github/v/release/edrisranjbar/lifeos?color=39e6ad)](https://github.com/edrisranjbar/lifeos/releases) [![GitHub stars](https://img.shields.io/github/stars/edrisranjbar/lifeos?style=flat&color=f3c969)](https://github.com/edrisranjbar/lifeos/stargazers) [![MIT license](https://img.shields.io/badge/license-MIT-blue)](LICENSE) [![Docker](https://img.shields.io/badge/docker-compose_up-2496ed?logo=docker&logoColor=white)](#with-docker-recommended) [![MCP server](https://img.shields.io/badge/MCP-15_tools-39e6ad)](#talk-to-your-life-os-with-ai) [![PHP 8.1+](https://img.shields.io/badge/PHP-8.1%2B-777bb4?logo=php&logoColor=white)](#requirements)
 
-**[Website](https://edrisranjbar.github.io/lifeos/)** · [Quick start](#quick-start) · [Tour](#a-quick-tour) · [AI / MCP](#talk-to-your-life-os-with-ai) · [Deploy](docs/deployment.md) · [API](docs/api.md) · **[Español](README.es.md)**
+**[Website](https://edrisranjbar.github.io/lifeos/)** · [Quick start](#quick-start) · [Tour](#a-quick-tour) · [AI / MCP](#talk-to-your-life-os-with-ai) · [Deploy](docs/deployment.md) · [API](docs/api.md) · [Donate](#donations) · [Contact](#contact) · **[Español](README.es.md)**
 
 <br>
 
@@ -230,6 +230,30 @@ Built with PHP, MySQL and vanilla JavaScript — no frontend build step, no fram
 - [Deployment guide](docs/deployment.md) — Apache, shared hosting, backups and migration
 - [Development guide](docs/development.md) — local checks and disposable integration fixtures
 - [Growth workspace](docs/growth.md) · [Debts and credits](docs/financial-commitments.md)
+
+## Donations
+
+If Edi Life OS is useful to you, consider supporting its development with a donation.
+
+**[Donate through Donatr](https://donatr.ee/edicodes)** — choose an available donation method on my public page.
+
+[Toman payment Gateway](https://edrisranjbar.ir/donation)
+
+You can also donate directly to these public receiving addresses:
+
+| Cryptocurrency | Network | Receiving address |
+| --- | --- | --- |
+| Bitcoin (BTC) | Bitcoin (on-chain) | `bc1qdwdpeqv0l8ala8tm46rtfeghuxl70een84npj3` |
+| Ether (ETH) | Ethereum mainnet | `0x695CCF873d51E4C2dC1321b405C63BFE99c5a536` |
+| Solana (SOL) | Solana mainnet | `C2d9u9nY2hZfxsi5Fwz1o5VjGGQujWmxeqZ3upKvHBfD` |
+
+Send only the listed cryptocurrency on the specified network.
+
+## Contact
+
+For questions, feedback or collaboration, email **[edris.qeshm2@gmail.com](mailto:edris.qeshm2@gmail.com)**.
+
+For bugs and feature requests, please [open a GitHub issue](https://github.com/edrisranjbar/lifeos/issues/new/choose) so the discussion is easy to follow.
 
 ## License
 
